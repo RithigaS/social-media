@@ -1,15 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SideBar from "../components/SideBar";
 import { Outlet } from "react-router-dom";
 import { useState } from "react";
-import { X } from "lucide-react";
-import { Menu } from "lucide-react";
-import { dummyUserData } from "../assets/assets";
+import { X, Menu } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 import Loading from "../components/Loading";
 const Layout = () => {
-  const user = dummyUserData;
+  const { user, isLoaded, isSignedIn } = useUser();
+  const navigate = useNavigate();
   const [SidebarOpen, setSidebarOpen] = useState(false);
-  return user ? (
+
+  useEffect(() => {
+    if (isLoaded && !isSignedIn) {
+      navigate("/sign-in");
+    }
+  }, [isLoaded, isSignedIn, navigate]);
+
+  if (!isLoaded) return <Loading />;
+  return isSignedIn ? (
     <div className="w-full h-screen flex">
       <SideBar sidebarOpen={SidebarOpen} setSidebarOpen={setSidebarOpen} />
       <div className="flex-1 bg-slate-50 ml-0 sm:ml-64 xl:ml-72 transition-all duration-300">

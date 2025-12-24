@@ -11,19 +11,26 @@ import Profile from "./pages/Profile";
 import CreatePost from "./pages/CreatePost";
 import Discover from "./pages/Discover";
 import Layout from "./pages/Layout";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useAuth } from "@clerk/clerk-react";
 import { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
 
 const App = () => {
   const { user } = useUser();
+  const { getToken } = useAuth();
+  useEffect(() => {
+    if (user) {
+      getToken().then((token) => console.log(token));
+    }
+  }, [user]);
 
   return (
     <>
       <Toaster />
       <Routes>
         {/* Authentication Routes */}
-        <Route path="/sign-in" element={<SignInPage />} />
-        <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="/sign-in/*" element={<SignInPage />} />
+        <Route path="/sign-up/*" element={<SignUpPage />} />
 
         {/* Login or Entire Layout */}
         <Route path="/" element={<Layout />}>

@@ -1,13 +1,13 @@
 import React from "react";
-import { assets, dummyUserData } from "../assets/assets";
+import { assets } from "../assets/assets";
 import { useNavigate, Link } from "react-router-dom";
 import MenuItems from "./MenuItems";
 import { CirclePlus, LogOut } from "lucide-react";
-import { UserButton, useClerk } from "@clerk/clerk-react";
+import { UserButton, useClerk, useUser } from "@clerk/clerk-react";
 
 const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
-  const user = dummyUserData;
+  const { user } = useUser();
   const { signOut } = useClerk();
 
   const handleSignOut = async () => {
@@ -49,7 +49,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
           to="/create-post"
           className="
             flex items-center justify-center gap-2 py-3 mt-10 mx-auto rounded-xl
-            bg-gradient-to-r from-purple-600 to-indigo-600
+            bg-linear-to-r from-purple-600 to-indigo-600
             text-white font-semibold shadow-lg w-full
             hover:shadow-[0_0_15px_rgba(147,51,234,0.8)]
             hover:scale-[1.03] transition-all duration-200
@@ -82,9 +82,13 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
           />
           <div>
             <h1 className="font-semibold text-lg text-purple-700">
-              {user.full_name}
+              {user?.fullName || "User"}
             </h1>
-            <p className="text-sm text-purple-500">@{user.username}</p>
+            <p className="text-sm text-purple-500">
+              @
+              {user?.username ||
+                user?.primaryEmailAddress?.emailAddress.split("@")[0]}
+            </p>
           </div>
         </div>
 

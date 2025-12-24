@@ -2,23 +2,42 @@ import React, { useState } from "react";
 import UserProfileInfo from "../components/UserProfileInfo";
 import PostCard from "../components/PostCard";
 import ProfileModal from "../components/ProfileModal";
-import { dummyUserData, dummyPostsData } from "../assets/assets";
+import { dummyPostsData } from "../assets/assets";
+import { useUser } from "@clerk/clerk-react";
+import Loading from "../components/Loading";
 
 /**
  * Profile Page Component
  * Displays the full profile page including the header info, tabs, and content (posts).
  */
 const Profile = () => {
-  // State to manage the active content tab
+  const { user, isLoaded } = useUser();
   const [activeTab, setActiveTab] = useState("posts");
-
-  // State to manage user data (initialized with dummy data)
-  const [userData, setUserData] = useState(dummyUserData);
   const [showEdit, setShowEdit] = useState(false);
+
+  if (!isLoaded) return <Loading />;
+  if (!user) return null;
+
+  // Map Clerk user to internal format
+  const userData = {
+    _id: user.id,
+    full_name: user.fullName,
+    username:
+      user.username || user.primaryEmailAddress?.emailAddress.split("@")[0],
+    email: user.primaryEmailAddress?.emailAddress,
+    profile_picture: user.imageUrl,
+    bio: user.publicMetadata?.bio || "hey there i am using Friend Up",
+    location: user.publicMetadata?.location || "",
+    is_verified: true,
+    followers: user.publicMetadata?.followers || [],
+    following: user.publicMetadata?.following || [],
+  };
 
   // Filter posts belonging to this user
   const myPosts = dummyPostsData.filter(
-    (post) => post.user._id === dummyUserData._id
+    (post) =>
+      post.user._id === user.id ||
+      post.user._id === "user_2zdFoZib5lNr614LgkONdD8WG32" // Allowing dummy posts for now
   );
 
   // Extract media items from posts
